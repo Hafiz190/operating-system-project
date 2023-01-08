@@ -387,3 +387,168 @@ void PS_nonpreemptive(struct linkedList process[]){
             }
         }
     }
+fprintf(fptr , "%s" , "\nScheduling Method : Priority Scheduling (Non-Preemptive)\nProcess Waiting Times:");
+
+    for(i = 0; i < SIZE; i++) {
+        fprintf(fptr , "\nP%d: %d ms", i+1, temp[i].wTime);
+    }
+   
+    fprintf(fptr,"\nAverage waiting time: %f ms\n",averageWaitingTime);
+    printf("%s" ,"\nOutput is stored in the output file \n");
+    fclose(fptr);
+}
+
+void RR(struct linkedList process[], int quantumTime){
+    int i,x;
+    int y = 0;
+    int resumeStatus=0;
+    int currentTime=0;
+    int totalWaitingTime=0;
+    double averageWaiting;
+    struct linkedList *temp1, *temp2;
+    temp1 = (struct linkedList *) malloc (SIZE*sizeof(struct linkedList));
+    temp2 = (struct linkedList *) malloc (SIZE*sizeof(struct linkedList));
+    
+    FILE *fptr;
+	fptr = fopen("output.txt", "a");
+	if (fptr == NULL)
+	{
+		printf("Error!");
+		exit(1);
+	}
+
+    for(i=0;i<SIZE;i++)
+        temp1[i]=process[i];
+
+    struct linkedList list;
+    int a,b;
+    for(a=1;a<SIZE;a++) {
+        for (b = 0; b < SIZE - a; b++) {
+            if (temp1[b].aTime > temp1[b + 1].aTime) {
+                list = temp1[b];
+                temp1[b] = temp1[b + 1];
+                temp1[b + 1] = list;
+            }
+        }
+    }
+
+    for(i = 0;i < SIZE; i++)
+        temp2[i]=temp1[i];
+
+    do{
+        if(y>SIZE-1){y=0;}
+
+        x=0;
+        while(x<quantumTime && temp1[y].bTime > 0){
+            x++;
+            currentTime++;
+            temp1[y].bTime--;
+        }
+
+        if(temp1[y].bTime <= 0 && temp1[y].sr != 1){
+            temp1[y].wTime = currentTime - temp2[y].bTime - temp1[y].aTime;
+            resumeStatus++;
+            temp1[y].sr = 1;
+            totalWaitingTime = totalWaitingTime + temp1[y].wTime;
+        }
+        y++;
+    }while (resumeStatus < SIZE);
+
+    averageWaiting = (double)totalWaitingTime/SIZE;
+   
+    fprintf(fptr  , "%s" ,"\nScheduling Method : Round-Robin\nProcess Waiting Times:");
+   
+    fprintf(fptr,"\nAverage waiting time: %f ms\n",averageWaiting);
+    
+    fprintf(fptr,"Scheduling Method : First Come First Served\nProcess Waiting Times:");
+
+    for(i = 0; i < SIZE; i++) {
+        fprintf(fptr,"\nP%d: %d ms", i+1, temp1[i].wTime);
+    }
+    fprintf(fptr,"\nAverage waiting time: %f ms\n",averageWaiting);
+    printf("%s" ,"\nOutput is stored in the output file \n");
+    fclose(fptr);
+}
+
+int main(int argc, char **argv) 
+
+	{
+    	struct linkedList *process;
+    	process = (struct linkedList *) malloc (SIZE*sizeof(struct linkedList));
+    	int i = 0;
+    	int mode = 0;
+    	int choice,option,option2,quantumTime;
+    
+
+    FILE *fp = fopen("input.txt", "r");
+    
+    
+    char line[LINE_MAX];
+    char *ovalue = NULL;
+    unsigned int num[3];
+
+
+
+    opterr = 0;
+
+    while ((choice = getopt (argc, argv, "f:o:")) != -1)
+        switch (choice)
+        {
+            case 's':
+                if ((fp = fopen(optarg, "r")) == NULL)
+                    return 0;
+                    
+                while (fgets(line, LINE_MAX, fp) != NULL) {
+                    sscanf(line,"%d:%d:%d\n",&num[0],&num[1],&num[2]);
+                    process[i].Name = i+1;
+                    process[i].bTime = num[0];
+                    process[i].aTime = num[1];
+                    process[i].p = num[2];
+                    i++;
+                }
+                fclose(fp);
+                break;
+            case 'o':
+                ovalue = optarg;
+                fp = fopen(optarg,"w");
+                break;
+            default:
+                abort ();
+        }
+        
+        printf("\t\t\t\t\t CPU Scheduler Simulator\n");
+        
+    do{
+        if (mode == 0)
+            printf("\nMODE : Preemptive\n\n");
+            
+        else if (mode == 1)
+            printf("\nMODE : Non-Preemptive\n"); 
+            
+            
+        printf("1) Scheduling Method (None)\n");
+        printf("2) Preemptive Mode\n");
+        printf("3) Non-Preemptive Mode\n");
+        printf("4) Show Result\n");
+        printf("5) End Program\n");
+        printf("Option> ");
+        scanf("%d",&option);
+        switch (option)
+		
+		{
+            case 1:
+                if (mode == 0)
+                    printf("\n\n\n\n MODE : Preemptive\n");
+                    
+                else if (mode == 1)
+                    printf("\nMODE : Non-Preemptive\n"); 
+                    
+                printf("1) First Come, First Served Scheduling\n");
+                printf("2) Shortest-Job-First Scheduling\n");
+                printf("3) Priority Scheduling\n");
+                printf("4) Round-Robin Scheduling\n");
+                printf("5) Back\n");
+                printf("\n\n");
+                printf("Option> ");
+                
+                scanf("%d",&option2);
