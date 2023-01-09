@@ -126,7 +126,9 @@ void SJFS_nonpreemptive(struct linkedList process[])
     }
 
     totalWaitingTime = temp[0].wTime = 0;
-	 for(i = 1; i < SIZE; i++)
+
+    for(i = 1; i < SIZE; i++)
+	
 	{
         temp[i].wTime = (temp[i-1].bTime + temp[i-1].aTime + temp[i-1].wTime) - temp[i].aTime;
         totalWaitingTime += temp[i].wTime;
@@ -387,7 +389,8 @@ void PS_nonpreemptive(struct linkedList process[]){
             }
         }
     }
-fprintf(fptr , "%s" , "\nScheduling Method : Priority Scheduling (Non-Preemptive)\nProcess Waiting Times:");
+
+    fprintf(fptr , "%s" , "\nScheduling Method : Priority Scheduling (Non-Preemptive)\nProcess Waiting Times:");
 
     for(i = 0; i < SIZE; i++) {
         fprintf(fptr , "\nP%d: %d ms", i+1, temp[i].wTime);
@@ -552,3 +555,68 @@ int main(int argc, char **argv)
                 printf("Option> ");
                 
                 scanf("%d",&option2);
+                switch (option2)
+                
+				
+				{
+                    case 1:
+                       		FCFS(process);
+                        break;
+                    case 2:
+                        if (mode == 0){
+                            SJFS_preemptive(process);
+                        }
+                        if (mode == 1){
+                            SJFS_nonpreemptive(process);
+                        }
+                        break;
+                    case 3:
+                        if (mode == 0){
+                            PS_preemptive(process,fp);
+                        }
+                        if (mode == 1){
+                            PS_nonpreemptive(process);
+                        }
+                        break;
+                        
+                    case 4:
+                        printf("\nEnter quantum time : ");
+                        scanf("%d",&quantumTime);
+                        RR(process, quantumTime);
+                        break;
+                        
+                    case 5:
+                        break;
+                        
+                    default:
+                        printf("Invalid Option! Please Choose From 1 - 5\n");
+                        break;
+                }
+                break;
+                
+            case 2:
+                mode = 0;
+                break;
+            case 3:
+                mode = 1;
+                break;
+                
+            case 4:
+                fp = fopen(ovalue, "r");
+                while (fgets(line, LINE_MAX, fp)){
+                    printf(line);
+                }
+                break;
+                
+            case 5:
+                abort();
+                
+            default:
+                printf("\nInvalid Option! Please Choose From 1 - 5 \n");
+                break;
+        }
+    }
+	
+	while (option != 5);
+    return 0;
+}
